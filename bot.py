@@ -39,9 +39,9 @@ def echo_all(message):
                 bot.reply_to(message,
                              f"Hey, {message.from_user.first_name}. I am sorry, but your audio file exceeds 3 minute limit. Please send me a shorter file"
                              , parse_mode='markdown')
-        except:
+        except Exception as e:
             bot.reply_to(message,
-                         f"Hey, {message.from_user.first_name}. I am sorry, but something went wrong and i cannot process your file for whatever reason. Hold on, i have already notified my maker."
+                         f"Hey, {message.from_user.first_name}. I am sorry, but something went wrong and i cannot process your file for whatever reason. Notify my maker. tell him that \n {e}"
                          , parse_mode='markdown')
             print('Input audio file issue')
     else:
