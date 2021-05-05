@@ -1,2 +1,8 @@
 pyTelegramBotAPI
 python-dotenv==0.17.1
+SoundFile==0.10.3.post1
+librosa==0.8.0
+pydot>=1.4.1
+watchdog>=1.0.2
+google-cloud-storage>=1.35.1
+gunicorn==20.0.4
