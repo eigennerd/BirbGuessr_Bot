@@ -74,7 +74,7 @@ def read_audio(message, bot, model=model, message_type='voice'):
             pass
         else:
             os.mkdir(temp_folder)
-
+        print('folder check')
         if message_type == 'voice':
             file_info = bot.get_file(message.voice.file_id)
         else:
@@ -83,14 +83,14 @@ def read_audio(message, bot, model=model, message_type='voice'):
         downloaded_file = bot.download_file(file_info.file_path)
 
         src_filename = 'temp/user_voice.ogg'
-
+        print('file downloaded')
         with open(src_filename, 'wb') as new_file:
             new_file.write(downloaded_file)
 
         wave_data, wave_rate = librosa.load(src_filename)
 
         os.remove(src_filename) #rm file as soon as we read it
-
+        print('file checked and cleared up')
         wave_data, _ = librosa.effects.trim(wave_data)
         target_size = (216, 216)
         sample_length = 5 * wave_rate
@@ -114,7 +114,7 @@ def read_audio(message, bot, model=model, message_type='voice'):
                     output_array = spectre_array
                 else:
                     output_array = np.concatenate((output_array, spectre_array), axis=0)
-
+        print('samples prepared')
         samples_from_file = pd.DataFrame(samples_from_file)
 
         datagen = ImageDataGenerator(rescale=1. / 255, preprocessing_function=preprocess_input)
@@ -128,8 +128,9 @@ def read_audio(message, bot, model=model, message_type='voice'):
             batch_size=1,
             class_mode='categorical'
         )
-
+        print('image generator prepared')
         preds = model.predict(test_generator, steps=len(samples_from_file))  # feeding test generator to model
+        print('predictions ready')
         logits = logit(preds)
         list_of_preds = []
         table_of_probabilities = pd.DataFrame({"ebird_code": classes_to_predict,
@@ -137,12 +138,12 @@ def read_audio(message, bot, model=model, message_type='voice'):
                                                "logit": logits.mean(axis=0)}).merge(
             birds_df[['ebird_code', 'en', 'gen', 'sp']], on='ebird_code'
         )
-
+        print('table of probabilities ready')
         for i in range(0, len(samples_from_file)):
             list_of_preds.append({"bird": f"{classes_to_predict[np.argmax(preds[i])]}"})
 
         predicted_bird = table_of_probabilities.nlargest(1, columns='certainty').ebird_code.values[0]
-
+        print('ready to return')
         return  predicted_bird,\
                 birds_df.loc[birds_df.ebird_code == predicted_bird].url.values[0], \
                "{} {}".format(birds_df.loc[birds_df.ebird_code == predicted_bird].gen.values[0],
