@@ -29,8 +29,6 @@ def echo_all(message):
                 bot.reply_to(message,
                              f"Alright, {message.from_user.first_name}. Your recording is **{message.voice.duration}** sec long. Here's what it sounds to me\n\n\nSpecies: {sci_name}\nCommon name: [{common_name}](http://en.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
                              ,parse_mode='markdown')
-                #img = Image.open(requests.get(pic_url, stream=True).raw)
-                #bot.send_photo(message.chat.id, img)
         except Exception as e:
             bot.reply_to(message,
                          f"Hey, {message.from_user.first_name}. I am sorry, but something went wrong and i cannot process your recording for whatever reason. My maker has been notified \n "
@@ -50,10 +48,8 @@ def echo_all(message):
             else:
                 ebird_code, pic_url, sci_name, common_name = read_audio(message, bot, message_type='audio')
                 bot.reply_to(message,
-                             f"Got your audio, {message.from_user.first_name}. It is **{message.voice.duration}** sec long. Here's what it sounds to me\n\n\nSpecies (Top Guess): {sci_name}\nCommon name: [{common_name}](http://en.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
+                             f"Got your audio, {message.from_user.first_name}. It is **{message.audio.duration}** sec long. Here's what it sounds to me\n\n\nSpecies: {sci_name}\nCommon name: [{common_name}](http://en.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
                              ,parse_mode='markdown')
-                #img = Image.open(requests.get(pic_url, stream=True).raw)
-                #bot.send_photo(message.chat.id, img)
         except Exception as e:
             bot.reply_to(message,
                          f"Hey, {message.from_user.first_name}. I am sorry, but something went wrong and i cannot process your file for whatever reason. My maker has been notified. \n "
