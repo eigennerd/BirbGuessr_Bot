@@ -97,21 +97,23 @@ def read_audio(message, bot, model=model, message_type='voice'):
         N_mels = 216
         for idx in range(0, len(wave_data), sample_length): # dumping spectrograms, making an array for output
             song_sample = wave_data[idx:idx + sample_length]
-            if len(song_sample) >= sample_length:
-                mel = melspectrogram(song_sample, n_mels=N_mels, fmin=1400)
-                db = librosa.power_to_db(mel ** 2)
-                normalised_db = minmax_scale(db)
-                sample_name = str(idx)+".tif"
-                db_array = (np.asarray(normalised_db) * 255).astype(np.uint8)
-                spectre_array = np.array([db_array, db_array, db_array]).T
-                spectre_image = Image.fromarray(spectre_array)
-                spectre_image.save(f"{temp_folder}/{sample_name}") ## saving files to temp folder
-                samples_from_file.append({"song_sample":f"{temp_folder}/{sample_name}",
-                                                    "y":"nocall"})
-                if idx == 0: #
-                    output_array = spectre_array
-                else:
-                    output_array = np.concatenate((output_array, spectre_array), axis=0)
+            if len(song_sample) < sample_length: # for last "incomplete" 5-second piece of audio
+                song_sample = wave_data[-sample_length:] # instead take the LAST FULL 5 second piece of audio (allow overlap)
+
+            mel = melspectrogram(song_sample, n_mels=N_mels, fmin=1400)
+            db = librosa.power_to_db(mel ** 2)
+            normalised_db = minmax_scale(db)
+            sample_name = str(idx)+".tif"
+            db_array = (np.asarray(normalised_db) * 255).astype(np.uint8)
+            spectre_array = np.array([db_array, db_array, db_array]).T
+            spectre_image = Image.fromarray(spectre_array)
+            spectre_image.save(f"{temp_folder}/{sample_name}") ## saving files to temp folder
+            samples_from_file.append({"song_sample":f"{temp_folder}/{sample_name}",
+                                                "y":"nocall"})
+            if idx == 0: #
+                output_array = spectre_array
+            else:
+                output_array = np.concatenate((output_array, spectre_array), axis=0)
         samples_from_file = pd.DataFrame(samples_from_file)
 
         datagen = ImageDataGenerator(rescale=1. / 255, preprocessing_function=preprocess_input)

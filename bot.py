@@ -26,8 +26,9 @@ def echo_all(message):
                              , parse_mode='markdown')
             else:
                 bird_proba, pic_url, sci_name, common_name =read_audio(message, bot)
+                warning = '' if bird_proba>0.05 else '\nInterference detected: noise or other non-bird patterns may decrease the accuracy of bird detection. \n'
                 bot.reply_to(message,
-                             f"Alright, {message.from_user.first_name}. Your recording is **{message.voice.duration}** sec long. Here's what it sounds to me\n\n\nSpecies: {sci_name}\nCommon name: [{common_name}](http://en.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
+                             f"Alright, {message.from_user.first_name}. Your recording is **{message.voice.duration}** sec long. {warning}Here's what it sounds to me\n\n\nSpecies: {sci_name}\nCommon name: [{common_name}](http://en.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
                              ,parse_mode='markdown')
         except Exception as e:
             bot.reply_to(message,
@@ -35,7 +36,7 @@ def echo_all(message):
                          , parse_mode='markdown')
             print(f"message.voice issue: {e}")
 
-    elif message.content_type=='audio':
+    elif message.content_type=='audio': #TODO: optimize this, combine with 'voice' section
         try:
             if message.audio.duration < 5: ## check for audio length
                 bot.reply_to(message,
@@ -47,8 +48,9 @@ def echo_all(message):
                              , parse_mode='markdown')
             else:
                 ebird_code, pic_url, sci_name, common_name = read_audio(message, bot, message_type='audio')
+                warning = '' if bird_proba > 0.05 else '\nInterference detected: noise or other non-bird patterns may decrease the accuracy of bird detection. \n'
                 bot.reply_to(message,
-                             f"Got your audio, {message.from_user.first_name}. It is **{message.audio.duration}** sec long. Here's what it sounds to me\n\n\nSpecies: {sci_name}\nCommon name: [{common_name}](http://en.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
+                             f"Got your audio, {message.from_user.first_name}. It is **{message.audio.duration}** sec long. {warning}Here's what it sounds to me\n\n\nSpecies: {sci_name}\nCommon name: [{common_name}](http://en.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
                              ,parse_mode='markdown')
         except Exception as e:
             bot.reply_to(message,
