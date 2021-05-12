@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     bot.reply_to(message,
-                f"Hi, {message.from_user.first_name} {message.from_user.last_name},\nIt's me, <b>{bot.get_me().first_name}</b>. Try sending me a voice or an audio message (optimally if they are between 7 and 30 seconds long) and i will find the best matching bird to that sound. \n\nWorry not, I do not store your data and will delete all traces of your audiofile swiftly after processing. ",
+                f"Hi, {message.from_user.first_name} {message.from_user.last_name},\nIt's me, <b>{bot.get_me().first_name}</b>. Try sending me a voice or an audio message (optimally if about 7 to 30 seconds long) and I will find the best matching bird to that sound. \n\nWorry not, I do not store your data and will delete all traces of your audio-file swiftly after processing. ",
                 parse_mode='html')
     logger.info(f"{hash(message.from_user)} said hi on {datetime.now()}")
 
