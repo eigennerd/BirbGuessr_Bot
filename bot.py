@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     bot.reply_to(message,
-                f"Hi, {message.from_user.first_name} {message.from_user.last_name},\nIt's me, <b>{bot.get_me().first_name}</b>. Try sending me a voice message or an audio file of at least 5 second length and i will guess the bird species. \n\nWorry not, I do not store your data and will delete all traces of your audiofile swiftly after processing. ",
+                f"Hi, {message.from_user.first_name} {message.from_user.last_name},\nIt's me, <b>{bot.get_me().first_name}</b>. Try sending me a voice or an audio message (optimally if they are between 7 and 30 seconds long) and i will find the best matching bird to that sound. \n\nWorry not, I do not store your data and will delete all traces of your audiofile swiftly after processing. ",
                 parse_mode='html')
     logger.info(f"{hash(message.from_user)} said hi on {datetime.now()}")
 
@@ -25,7 +25,7 @@ def echo_all(message):
         try:
             if message.voice.duration < 5:  ## check for audio length
                 bot.reply_to(message,
-                             f"Hey, {message.from_user.first_name}. I need a sample larger than 5 seconds, could you send me another one?"
+                             f"Hey, {message.from_user.first_name}. I require at least 5s of audio, could you send me another sample?"
                              , parse_mode='markdown')
                 logger.warning(f"{hash(message.from_user)} sent an incomplete voice on {datetime.now()}")
             else:
@@ -47,7 +47,7 @@ def echo_all(message):
         try:
             if message.audio.duration < 5: ## check for audio length
                 bot.reply_to(message,
-                             f"Hey, {message.from_user.first_name}. I need a sample larger than 5 seconds, could you send me another one?"
+                             f"Hey, {message.from_user.first_name}. I require at least 5s of audio, could you send me another sample?"
                              , parse_mode='markdown')
                 logger.warning(f"{hash(message.from_user)} sent an incomplete audio on {datetime.now()}")
             elif message.audio.duration >180:
