@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     bot.reply_to(message,
-                f"Hi, {message.from_user.first_name} {message.from_user.last_name},\nIt's me, <b>{bot.get_me().first_name}</b>. Try sending me a voice or an audio message (optimally if about 7 to 30 seconds long) and I will find the best matching bird to that sound. \n\nWorry not, I do not store your data and will delete all traces of your audio-file swiftly after processing. ",
+                f"Hi, {message.from_user.first_name} {message.from_user.last_name},\nIt's me, <b>{bot.get_me().first_name}</b>. Shoot me with a voice / audio msg (nice if about 7 to 30 sec long) and I will match that with a bird to the best of my abilities. \n\nWorry not, your interaction with me is strictly confidential.",
                 parse_mode='html')
     logger.info(f"{hash(message.from_user)} said hi on {datetime.now()}")
 
@@ -30,7 +30,7 @@ def echo_all(message):
                 logger.warning(f"{hash(message.from_user)} sent an incomplete voice on {datetime.now()}")
             else:
                 bird_proba, pic_url, sci_name, common_name =read_audio(message, bot)
-                warning = '' if bird_proba>0.05 else '\nInterference detected: noise or other non-bird patterns may decrease the accuracy of bird detection. \n'
+                warning = '' if bird_proba>0.05 else "\nInterference detected: noise or other non-bird patterns may hinder the birds finding. \n"
                 bot.reply_to(message,
                              f"Alright, {message.from_user.first_name}. Your recording is **{message.voice.duration}** sec long. {warning}Here's what it sounds to me\n\n\nSpecies: {sci_name}\nCommon name: [{common_name}](http://en.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
                              ,parse_mode='markdown')
