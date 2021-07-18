@@ -50,7 +50,7 @@ def echo_all(message):
                 logger.warning(f"{hash(message.from_user)} sent an incomplete voice on {datetime.now()}")
             else:
                 bird_proba, pic_url, sci_name, common_name =read_audio(message, bot)
-                warning = '' if bird_proba>0.05 else {text[lang]['interference']}
+                warning = '' if bird_proba>0.05 else text[lang]['interference']
                 bot.reply_to(message,
                              f"{text[lang]['alright']}, {message.from_user.first_name}. {text[lang]['your_recording']}**{message.voice.duration}** {text[lang]['sec_long']}{warning}{text[lang]['species']}: {sci_name}\n{text[lang]['common_name']}: [{common_name}](http://{message.from_user.language_code}.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
                              ,parse_mode='markdown')
@@ -77,7 +77,7 @@ def echo_all(message):
                 logger.warning(f"{hash(message.from_user)} sent a too large audio file on {datetime.now()}")
             else:
                 bird_proba, pic_url, sci_name, common_name = read_audio(message, bot, message_type='audio')
-                warning = '' if bird_proba > 0.05 else {text[lang]['interference']}
+                warning = '' if bird_proba > 0.05 else text[lang]['interference']
                 bot.reply_to(message,
                              f"{text[lang]['got_audio']}, {message.from_user.first_name}. **{message.audio.duration}** {text[lang]['sec_long']}. {warning}{text[lang]['species']}: {sci_name}\n{text[lang]['common_name']}: [{common_name}](http://{message.from_user.language_code}.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
                              ,parse_mode='markdown')
