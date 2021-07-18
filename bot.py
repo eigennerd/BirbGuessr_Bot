@@ -52,7 +52,7 @@ def echo_all(message):
                 bird_proba, pic_url, sci_name, common_name =read_audio(message, bot)
                 warning = '' if bird_proba>0.05 else {text[lang]['interference']}
                 bot.reply_to(message,
-                             f"{text[lang]['alright']}, {message.from_user.first_name}. {text[lang]['your_recording']}**{message.voice.duration}** {text[lang]['sec_long']}. {warning}{text[lang]['species']}: {sci_name}\n{text[lang]['common_name']}: [{common_name}](http://{message.from_user.language_code}.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
+                             f"{text[lang]['alright']}, {message.from_user.first_name}. {text[lang]['your_recording']}**{message.voice.duration}** {text[lang]['sec_long']}{warning}{text[lang]['species']}: {sci_name}\n{text[lang]['common_name']}: [{common_name}](http://{message.from_user.language_code}.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
                              ,parse_mode='markdown')
                 logger.info(f"{hash(message.from_user)} sent a complete voice on {datetime.now()}. Top accuracy was: {bird_proba}")
         except Exception as e:
