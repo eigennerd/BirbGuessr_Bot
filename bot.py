@@ -6,38 +6,58 @@ from datetime import datetime
 from PIL import Image
 import requests
 import re
-bot = telebot.TeleBot(cg.TOKEN)
+import yaml
 
+#
+# Settings
+#
+
+# init text
+with open("src/narrator.yaml", 'r') as stream:
+    try:
+        text = yaml.safe_load(stream)
+    except yaml.YAMLError as exc:
+        print(exc)
+
+# init bot
+bot = telebot.TeleBot(cg.TOKEN)
+# init logging
 logging.basicConfig(filename=f"data/logs.log", level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', force=True)
 logger = logging.getLogger(__name__)
 
+#
+# Body
+#
+
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
+    lang = message.from_user.language_code if message.from_user.language_code in ['en', 'ru', 'uk'] else 'en'
     bot.reply_to(message,
-                f"Hi, {message.from_user.first_name} {message.from_user.last_name},\nIt's me, <b>{bot.get_me().first_name}</b>. Shoot me with a voice / audio msg (nice if about 7 to 30 sec long) and I will match that with a bird to the best of my abilities. \n\nWorry not, your interaction with me is strictly confidential.",
+                f"""{text[lang]['hi']}, {message.from_user.first_name} {message.from_user.last_name},\n{text[lang]['its_me']}, <b>{bot.get_me().first_name}</b>. {text[lang]['shoot_me_a_msg']}""",
                 parse_mode='html')
     logger.info(f"{hash(message.from_user)} said hi on {datetime.now()}")
 
 
 @bot.message_handler(func=lambda message: True, content_types=['text', 'voice', 'audio', 'sticker', 'photo'])
 def echo_all(message):
+    lang = message.from_user.language_code if message.from_user.language_code in ['en', 'ru', 'uk'] else 'en'
     if message.content_type=='voice':
         try:
             if message.voice.duration < 5:  ## check for audio length
                 bot.reply_to(message,
-                             f"Hey, {message.from_user.first_name}. I require at least 5s of audio, could you send me another sample?"
+                             f"""{text[lang]['hey']}, {message.from_user.first_name}. {text[lang]['i_require_5s']}"""
                              , parse_mode='markdown')
                 logger.warning(f"{hash(message.from_user)} sent an incomplete voice on {datetime.now()}")
             else:
                 bird_proba, pic_url, sci_name, common_name =read_audio(message, bot)
-                warning = '' if bird_proba>0.05 else "\nInterference detected: noise or other non-bird patterns may hinder the birds finding. \n"
+                warning = '' if bird_proba>0.05 else {text[lang]['interference']}
                 bot.reply_to(message,
-                             f"Alright, {message.from_user.first_name}. Your recording is **{message.voice.duration}** sec long. {warning}Here's what it sounds to me\n\n\nSpecies: {sci_name}\nCommon name: [{common_name}](http://en.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
+                             f"{text[lang]['alright']}, {message.from_user.first_name}. {text[lang]['your_recording']}**{message.voice.duration}** {text[lang]['sec_long']}. {warning}{text[lang]['species']}: {sci_name}\n{text[lang]['common_name']}: [{common_name}](http://{message.from_user.language_code}.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
                              ,parse_mode='markdown')
                 logger.info(f"{hash(message.from_user)} sent a complete voice on {datetime.now()}. Top accuracy was: {bird_proba}")
         except Exception as e:
             bot.reply_to(message,
-                         f"Hey, {message.from_user.first_name}. I am sorry, but something went wrong and i cannot process your recording for whatever reason. My maker has been notified \n "
+                         f"{text[lang]['hey']}, {message.from_user.first_name}. {text[lang]['sorry_wrong']} "
                          , parse_mode='markdown')
             logger.error(
                 f"{hash(message.from_user)} encountered a voice error on {datetime.now()}. Error message: {e}")
@@ -47,32 +67,32 @@ def echo_all(message):
         try:
             if message.audio.duration < 5: ## check for audio length
                 bot.reply_to(message,
-                             f"Hey, {message.from_user.first_name}. I require at least 5s of audio, could you send me another sample?"
+                             f"{text[lang]['hey']}, {message.from_user.first_name}. {text[lang]['i_require_5s']}"
                              , parse_mode='markdown')
                 logger.warning(f"{hash(message.from_user)} sent an incomplete audio on {datetime.now()}")
             elif message.audio.duration >180:
                 bot.reply_to(message,
-                             f"Hey, {message.from_user.first_name}. I am sorry, but your audio file exceeds 3 minute limit. Please send me a shorter file"
+                             f"{text[lang]['hey']}, {message.from_user.first_name}. {text[lang]['long_audio']}"
                              , parse_mode='markdown')
                 logger.warning(f"{hash(message.from_user)} sent a too large audio file on {datetime.now()}")
             else:
                 bird_proba, pic_url, sci_name, common_name = read_audio(message, bot, message_type='audio')
-                warning = '' if bird_proba > 0.05 else '\nInterference detected: noise or other non-bird patterns may decrease the accuracy of bird detection. \n'
+                warning = '' if bird_proba > 0.05 else {text[lang]['interference']}
                 bot.reply_to(message,
-                             f"Got your audio, {message.from_user.first_name}. It is **{message.audio.duration}** sec long. {warning}Here's what it sounds to me\n\n\nSpecies: {sci_name}\nCommon name: [{common_name}](http://en.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
+                             f"{text[lang]['got_audio']}, {message.from_user.first_name}. **{message.audio.duration}** {text[lang]['sec_long']}. {warning}{text[lang]['species']}: {sci_name}\n{text[lang]['common_name']}: [{common_name}](http://{message.from_user.language_code}.wikipedia.org/wiki/{re.sub(' ', '_', sci_name)})"
                              ,parse_mode='markdown')
                 logger.info(
                     f"{hash(message.from_user)} sent a complete voice on {datetime.now()}. Top accuracy was: {bird_proba}")
         except Exception as e:
             bot.reply_to(message,
-                         f"Hey, {message.from_user.first_name}. I am sorry, but something went wrong and i cannot process your file for whatever reason. My maker has been notified. \n "
+                         f"{text[lang]['hey']}, {message.from_user.first_name}. {text[lang]['sorry_wrong']}"
                          , parse_mode='markdown')
             logger.error(
                 f"{hash(message.from_user)} encountered a voice error on {datetime.now()}. Error message: {e}")
             print(f"message.audio issue: {e}")
     else:
         bot.reply_to(message,
-                     "Thank you but I'd rather you sent me a voice recording or an audio file. Try again!")
+                     {text[lang]['try_again']})
         logger.warning(
             f"{hash(message.from_user)} sent gibberish on {datetime.now()}.")
 
