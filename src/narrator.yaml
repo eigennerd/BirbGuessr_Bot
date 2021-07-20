@@ -1,7 +1,7 @@
 en:
   hi: "Hi"
   its_me: "It's me"
-  shoot_me_a_msg: "I **guess** birds. Shoot me with a voice / audio msg (best if you `catch a bird` within 7 ~ 30 second sample) and I will match that with a species to the best of my abilities. \n\nWorry not, your interaction with me is strictly confidential."
+  shoot_me_a_msg: "I **guess** birds. Shoot me a voice or audio msg (best if you `catch a bird` within 7 ~ 30 second sample) and I will match that with a species to the best of my abilities. \n\nWorry not, your interaction with me is strictly confidential."
   hey: "Hey"
   i_require_5s: "I require at least 5s of audio, could you send me another sample?"
   interference: "\nInterference detected: noise or other non-bird patterns may hinder the birds finding. \n"
