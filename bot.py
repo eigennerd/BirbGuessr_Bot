@@ -101,4 +101,4 @@ def echo_all(message):
             f"{base64.b64encode(' '.join(str(x) for x in [message.from_user.first_name, message.from_user.last_name, message.from_user.id]).encode())} sent gibberish on {datetime.now()}.")
 
 
-bot.polling()
+bot.infinity_polling(timeout=10, long_polling_timeout = 5)
